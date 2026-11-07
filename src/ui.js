@@ -86,6 +86,16 @@
       p.appendChild(list);
     }
 
+    if (opts.update && opts.update.url) {
+      var up = el('div', 'lds-update');
+      var ua = el('a', null, '新版本 v' + opts.update.latest + ' 可用 →');
+      ua.href = opts.update.url;
+      ua.target = '_blank';
+      ua.rel = 'noreferrer';
+      up.appendChild(ua);
+      p.appendChild(up);
+    }
+
     var foot = el('div', 'lds-foot');
     var exportBtn = el('button', 'lds-btn', '导出 JSON');
     exportBtn.addEventListener('click', function () { opts.onExport && opts.onExport(); });

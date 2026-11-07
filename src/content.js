@@ -60,9 +60,11 @@
     var category = (document.querySelector('.badge-category__name') || {}).textContent || '';
     storeAggregate({ n: scored.length, sum: state.posts.reduce(function (a, b) { return a + b.score; }, 0), hot: s.hot, snark: s.snark, category: category.trim() });
 
-    UI.mount(UI.panel(s, {
-      title: 'L站舆情 · 本主题',
-      onExport: function () {
+    var mount = function (update) {
+      UI.mount(UI.panel(s, {
+        title: 'L站舆情 · 本主题',
+        update: update,
+        onExport: function () {
         var data = {
           url: location.href,
           title: document.title,
@@ -72,8 +74,23 @@
           })
         };
         download('lds-topic-' + Date.now() + '.json', JSON.stringify(data, null, 2));
-      }
-    }));
+        }
+      }));
+    };
+
+    try {
+      chrome.storage.local.get({ update: null }, function (data) {
+        var u = data.update;
+        var cur = chrome.runtime.getManifest().version;
+        if (u && u.newer && window.LDSVersion && window.LDSVersion.isNewer(cur, u.latest)) {
+          mount({ latest: u.latest, url: u.url || 'https://github.com/yxxbc/linuxdo-sentiment/releases/latest' });
+        } else {
+          mount(null);
+        }
+      });
+    } catch (e) {
+      mount(null);
+    }
   }
 
   function analyzeList() {

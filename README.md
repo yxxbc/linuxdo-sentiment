@@ -31,7 +31,7 @@
 - 手动：`./scripts/update.sh`（就是 `git pull`），然后到 `chrome://extensions` 点该扩展的刷新按钮；
 - 或重新下载 Release 覆盖文件夹，同样点刷新。
 
-工具栏弹窗里的「检查更新」会读 GitHub 的 latest release 和当前版本比对——**只有你点它才会发这一次网络请求**。
+版本检查不走 GitHub API，读的是仓库根目录的静态文件 `version.json`（普通 URL，无速率限制、无 token）。弹窗打开时若距上次检查超过 6 小时会拉一次；发现新版本后，面板底部和弹窗里都会出现「新版本 vX 可用 →」，点击直接跳到 Releases 页面。
 
 ## 隐私
 

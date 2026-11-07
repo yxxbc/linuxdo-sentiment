@@ -1,0 +1,5 @@
+{
+  "version": "0.2.1",
+  "url": "https://github.com/yxxbc/linuxdo-sentiment/releases/latest",
+  "notes": "版本检查改走静态 version.json；面板显示更新提示"
+}

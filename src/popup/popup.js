@@ -1,8 +1,9 @@
-/* 弹窗：只读本地计数；网络请求仅在点“检查更新”时发生（GitHub API，无正文）。 */
+/* 弹窗：只读本地计数；版本检查走静态 version.json（普通 URL，不是 API）。
+   检查结果写回 storage，面板据此显示更新提示，内容页本身不发请求。 */
 (function () {
   'use strict';
 
-  var REPO = 'yxxbc/linuxdo-sentiment';
+  var VERSION_URL = 'https://raw.githubusercontent.com/yxxbc/linuxdo-sentiment/main/version.json';
   var ver = chrome.runtime.getManifest().version;
   document.getElementById('ver').textContent = 'v' + ver;
 
@@ -18,7 +19,43 @@
     return n;
   }
 
-  chrome.storage.local.get({ days: {}, byCat: {} }, function (data) {
+  var msg = document.getElementById('msg');
+
+  function showUpdate(latest, url) {
+    msg.innerHTML = '';
+    msg.appendChild(document.createTextNode('有新版本 v' + latest + '，'));
+    var a = document.createElement('a');
+    a.href = url;
+    a.textContent = '去更新';
+    a.style.color = '#7aa2f7';
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      chrome.tabs.create({ url: url });
+    });
+    msg.appendChild(a);
+  }
+
+  function checkUpdate() {
+    msg.textContent = '检查中…';
+    fetch(VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        var latest = String(data.version || '');
+        if (!latest) throw new Error('version.json 无版本号');
+        var newer = window.LDSVersion.isNewer(ver, latest);
+        chrome.storage.local.set({ update: { latest: latest, url: data.url || '', checkedAt: Date.now(), newer: newer } });
+        if (newer) showUpdate(latest, data.url || 'https://github.com/yxxbc/linuxdo-sentiment/releases/latest');
+        else msg.textContent = '已是最新 v' + ver;
+      })
+      .catch(function (e) {
+        msg.textContent = '检查失败：' + e.message;
+      });
+  }
+
+  chrome.storage.local.get({ days: {}, byCat: {}, update: null }, function (data) {
     var d = (data.days || {})[todayKey()];
     var n = d ? d.n : 0;
     document.getElementById('n').textContent = n;
@@ -26,6 +63,16 @@
     document.getElementById('hot').textContent = d ? d.hot : 0;
     document.getElementById('snark').textContent = d ? d.snark : 0;
     if (!n) document.getElementById('empty').hidden = false;
+
+    // 先展示上次的检查结果，避免每次打开都请求
+    var up = data.update;
+    if (up && up.newer && window.LDSVersion.isNewer(ver, up.latest)) {
+      showUpdate(up.latest, up.url || 'https://github.com/yxxbc/linuxdo-sentiment/releases/latest');
+    } else if (up && Date.now() - up.checkedAt < 6 * 3600 * 1000) {
+      msg.textContent = '已是最新 v' + ver;
+    } else {
+      checkUpdate();
+    }
 
     var cats = Object.keys(data.byCat || {}).map(function (k) {
       var c = data.byCat[k];
@@ -52,32 +99,5 @@
     });
   });
 
-  document.getElementById('check').addEventListener('click', function () {
-    var msg = document.getElementById('msg');
-    msg.textContent = '检查中…';
-    fetch('https://api.github.com/repos/' + REPO + '/releases/latest', {
-      headers: { 'Accept': 'application/vnd.github+json' }
-    }).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).then(function (rel) {
-      var latest = String(rel.tag_name || '').replace(/^v/, '');
-      if (!latest) throw new Error('无 tag');
-      if (latest === ver) {
-        msg.textContent = '已是最新 v' + ver;
-      } else {
-        msg.innerHTML = '';
-        msg.appendChild(document.createTextNode('有新版本 v' + latest + '：'));
-        var a = document.createElement('a');
-        a.href = rel.html_url;
-        a.target = '_blank';
-        a.rel = 'noreferrer';
-        a.textContent = '下载';
-        a.style.color = '#7aa2f7';
-        msg.appendChild(a);
-      }
-    }).catch(function (e) {
-      msg.textContent = '检查失败：' + e.message;
-    });
-  });
+  document.getElementById('check').addEventListener('click', checkUpdate);
 })();

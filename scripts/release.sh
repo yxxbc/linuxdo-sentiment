@@ -16,6 +16,17 @@ json.dump(m,open(p,'w'),ensure_ascii=False,indent=2)
 open(p,'a').write('\n')
 PY
 
+python3 - "$VER" <<'PY'
+import json,sys
+p='version.json'
+try: d=json.load(open(p))
+except Exception: d={}
+d['version']=sys.argv[1]
+d.setdefault('url','https://github.com/yxxbc/linuxdo-sentiment/releases/latest')
+json.dump(d,open(p,'w'),ensure_ascii=False,indent=2)
+open(p,'a').write('\n')
+PY
+
 bash scripts/build.sh
 git add -A
 git commit -m "chore(release): v${VER}"
