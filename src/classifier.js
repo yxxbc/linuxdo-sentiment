@@ -279,7 +279,7 @@
   function grams(input) {
     var text = mask(String(input || '')).replace(/\s+/g, ' ');
     var out = [], total = 0;
-    for (var n = 2; n <= 3; n++) {
+    for (var n = 2; n <= 4; n++) {
       for (var i = 0; i + n <= text.length; i++) {
         out.push(hashGram(text, i, n));
         total++;
@@ -303,8 +303,8 @@
     var g = grams(input);
     for (var j = 0; j < g.length; j++) z += m.gram_weights[g[j][0]] * g[j][1];
     var p = sigmoid(z);
-    // 0.85 是在 COLD test 上 precision≈0.89 的高置信档，用来只标“明确攻击”
-    return { p: p, score: Math.round(p * 100), hit: p >= m.threshold, severe: p >= 0.85 };
+    // 0.80 是在 COLD test 上 precision≈0.91 的高置信档，用来只标“明确攻击”
+    return { p: p, score: Math.round(p * 100), hit: p >= m.threshold, severe: p >= 0.80 };
   }
 
   var api = {

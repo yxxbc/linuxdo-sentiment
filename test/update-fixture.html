@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../src/panel.css"></head>
+<body><pre id="out"></pre>
+<script src="../src/model.js"></script><script src="../src/classifier.js"></script>
+<script src="../src/version.js"></script><script src="../src/ui.js"></script>
+<script>
+var s = { n: 3, mean: 12, p90: 40, hot: 0, snark: 1, scored: [{score: 0}, {score: 30}, {score: 6}], top: [] };
+LDSUI.mount(LDSUI.panel(s, { title: 'test', update: { latest: '9.9.9', url: 'https://example.com/rel' } }));
+var a = document.querySelector('.lds-update a');
+document.getElementById('out').textContent = JSON.stringify({
+  link: !!a, text: a ? a.textContent : '', href: a ? a.getAttribute('href') : '',
+  versionOk: LDSVersion.isNewer('0.2.1', '9.9.9'), versionNo: LDSVersion.isNewer('0.2.1', '0.2.1')
+});
+</script></body></html>
