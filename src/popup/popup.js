@@ -3,7 +3,11 @@
 (function () {
   'use strict';
 
-  var VERSION_URL = 'https://raw.githubusercontent.com/yxxbc/linuxdo-sentiment/main/version.json';
+  // 两个静态源：jsDelivr 刷新快，raw 兜底（两者都带 CORS）
+  var VERSION_URLS = [
+    'https://cdn.jsdelivr.net/gh/yxxbc/linuxdo-sentiment@main/version.json',
+    'https://raw.githubusercontent.com/yxxbc/linuxdo-sentiment/main/version.json'
+  ];
   var ver = chrome.runtime.getManifest().version;
   document.getElementById('ver').textContent = 'v' + ver;
 
@@ -35,13 +39,23 @@
     msg.appendChild(a);
   }
 
-  function checkUpdate() {
-    msg.textContent = '检查中…';
-    fetch(VERSION_URL + '?t=' + Date.now(), { cache: 'no-store' })
+  function fetchVersion(i) {
+    if (i >= VERSION_URLS.length) return Promise.reject(new Error('所有源都不可用'));
+    return fetch(VERSION_URLS[i] + '?t=' + Date.now(), { cache: 'no-store' })
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
       })
+      .then(function (data) {
+        if (!data || !data.version) throw new Error('无版本号');
+        return data;
+      })
+      .catch(function () { return fetchVersion(i + 1); });
+  }
+
+  function checkUpdate() {
+    msg.textContent = '检查中…';
+    fetchVersion(0)
       .then(function (data) {
         var latest = String(data.version || '');
         if (!latest) throw new Error('version.json 无版本号');

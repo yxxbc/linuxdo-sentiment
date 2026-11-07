@@ -1,5 +1,5 @@
 {
-  "version": "0.2.2",
+  "version": "0.2.3",
   "url": "https://github.com/yxxbc/linuxdo-sentiment/releases/latest",
-  "notes": "模型重训：2-4 gram、dev 早停、train+dev 对比；高置信档降到 0.80"
+  "notes": "版本检查双源：jsDelivr 优先、raw 兜底"
 }
