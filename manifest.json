@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "L站舆情仪表",
+  "version": "0.1.0",
+  "description": "在 linux.do 页面上本地统计文本戾气、阴阳怪气与攻击性浓度，不联网、不上传内容。",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://linux.do/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://linux.do/*"
+      ],
+      "js": [
+        "src/model.js",
+        "src/classifier.js",
+        "src/core.js",
+        "src/ui.js",
+        "src/content.js"
+      ],
+      "css": [
+        "src/panel.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

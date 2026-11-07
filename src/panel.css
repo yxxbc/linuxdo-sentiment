@@ -1,0 +1,68 @@
+#lds-panel {
+  position: fixed; right: 18px; bottom: 18px; z-index: 2147483000;
+  width: 286px; padding: 12px 12px 10px;
+  background: #1b1d21; color: #e8e8e8;
+  border: 1px solid #333; border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.45);
+  font: 12px/1.45 -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+#lds-panel.lds-collapsed { width: auto; padding: 8px 10px; }
+#lds-panel.lds-collapsed .lds-score-row,
+#lds-panel.lds-collapsed .lds-bars,
+#lds-panel.lds-collapsed .lds-top,
+#lds-panel.lds-collapsed .lds-foot { display: none; }
+
+.lds-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.lds-title { font-weight: 600; color: #fff; letter-spacing: .3px; }
+.lds-x { background: none; border: 0; color: #888; font-size: 15px; line-height: 1; cursor: pointer; }
+.lds-x:hover { color: #fff; }
+
+.lds-score-row { display: flex; align-items: baseline; gap: 10px; }
+.lds-big { font-size: 26px; font-weight: 700; color: #fff; }
+.lds-unit { font-size: 11px; color: #888; font-weight: 400; }
+.lds-meta { color: #9a9a9a; font-size: 11px; }
+
+.lds-bars { margin: 8px 0 4px; }
+.lds-bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.lds-bar-label { width: 62px; color: #9a9a9a; font-size: 11px; }
+.lds-track { flex: 1; height: 6px; background: #2a2c31; border-radius: 3px; overflow: hidden; }
+.lds-fill { height: 100%; border-radius: 3px; }
+.lds-fill.hot { background: #e5484d; }
+.lds-fill.snark { background: #f5a524; }
+.lds-fill.warm { background: #7f8ea3; }
+.lds-fill.calm { background: #3d8b6b; }
+.lds-bar-num { width: 20px; text-align: right; color: #777; font-size: 11px; }
+
+.lds-top { margin-top: 8px; border-top: 1px solid #2c2e33; padding-top: 6px; }
+.lds-sub { color: #777; margin-bottom: 3px; }
+.lds-top-row { display: flex; gap: 6px; align-items: baseline; margin-bottom: 2px; }
+.lds-top-author { color: #7aa2f7; text-decoration: none; white-space: nowrap; }
+.lds-top-text { color: #aaa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.lds-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.lds-btn { background: #2a2c31; color: #ddd; border: 1px solid #3a3d44; border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+.lds-btn:hover { background: #33363d; }
+.lds-hint { color: #666; font-size: 10px; }
+
+.lds-chip {
+  display: inline-block; margin-left: 6px; padding: 0 6px;
+  border-radius: 9px; font-size: 10px; line-height: 16px; vertical-align: middle;
+  background: #2a2c31; color: #999; border: 1px solid #3a3d44;
+}
+.lds-chip.hot { background: #4a1d20; color: #ff8a8f; border-color: #6b2a2e; }
+.lds-chip.snark { background: #4a361a; color: #ffcf7a; border-color: #6b4d24; }
+.lds-chip.warm { background: #2c3442; color: #a9bdd6; border-color: #3b4657; }
+
+.lds-hot-post .cooked { background: rgba(229,72,77,.06); border-left: 2px solid rgba(229,72,77,.5); padding-left: 8px; }
+
+.lds-row-score { display: inline-block; margin-left: 6px; padding: 0 5px; border-radius: 8px; font-size: 10px; color: #999; background: #2a2c31; }
+.lds-row-score.hot { color: #ff8a8f; background: #4a1d20; }
+.lds-row-score.snark { color: #ffcf7a; background: #4a361a; }
+
+.lds-list-note {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 2147483000;
+  background: #1b1d21; color: #bbb; border: 1px solid #333; border-radius: 8px;
+  padding: 6px 10px; font: 12px/1.4 -apple-system, "PingFang SC", sans-serif;
+  transition: opacity .6s;
+}
+.lds-list-note.lds-fade { opacity: 0; }

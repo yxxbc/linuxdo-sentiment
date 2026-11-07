@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>fixture</title>
+<link rel="stylesheet" href="../src/panel.css">
+</head>
+<body>
+<div id="topic">
+  <article class="topic-post" data-post-id="1">
+    <div class="topic-meta-data"><a class="username" href="#"><span class="username">alice</span></a>
+      <div class="post-infos">#1</div></div>
+    <div class="cooked">支持支持，感谢大佬，参与一波</div>
+  </article>
+  <article class="topic-post" data-post-id="2">
+    <div class="topic-meta-data"><a class="username" href="#"><span class="username">bob</span></a>
+      <div class="post-infos">#2</div></div>
+    <div class="cooked">你这人是不是有病？别人问个问题你也要阴阳？</div>
+  </article>
+  <article class="topic-post" data-post-id="3">
+    <div class="topic-meta-data"><a class="username" href="#"><span class="username">carol</span></a>
+      <div class="post-infos">#3</div></div>
+    <div class="cooked">大佬说得对，已严肃学习</div>
+  </article>
+  <article class="topic-post" data-post-id="4">
+    <div class="topic-meta-data"><a class="username" href="#"><span class="username">dave</span></a>
+      <div class="post-infos">#4</div></div>
+    <div class="cooked">这个脚本我测了，500K 正常，满 1M 开始重复，可能是注意力问题。</div>
+  </article>
+</div>
+<pre id="out"></pre>
+
+<script src="../src/model.js"></script>
+<script src="../src/classifier.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/ui.js"></script>
+<script>
+(function () {
+  var posts = LDSCore.extractPosts(document);
+  var scored = posts.map(function (p) {
+    p.result = LDSClassifier.score(p.text);
+    var off = LDSClassifier.offensive(p.text);
+    if (off && off.severe) { p.result.severe = true; p.result.score = Math.max(p.result.score, 60); }
+    LDSUI.markPost(p, p.result);
+    return { author: p.author, score: p.result.score, label: p.result.label };
+  });
+  var s = LDSCore.summarize(posts.map(function (p) {
+    return { score: p.result.score, author: p.author, text: p.text, el: p.el };
+  }));
+  s.scored = posts.map(function (p) { return { score: p.result.score }; });
+  LDSUI.mount(LDSUI.panel(s, { title: 'L站舆情 · 本主题' }));
+  document.getElementById('out').textContent = JSON.stringify({
+    extracted: posts.length,
+    authors: posts.map(function (p) { return p.author; }),
+    scored: scored,
+    summary: { n: s.n, mean: s.mean, p90: s.p90, hot: s.hot, snark: s.snark },
+    panel: !!document.getElementById('lds-panel'),
+    chips: document.querySelectorAll('.lds-chip').length,
+    hotPosts: document.querySelectorAll('.lds-hot-post').length
+  });
+})();
+</script>
+</body></html>
