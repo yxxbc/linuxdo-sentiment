@@ -1,5 +1,5 @@
 {
-  "version": "0.2.3",
+  "version": "0.2.4",
   "url": "https://github.com/yxxbc/linuxdo-sentiment/releases/latest",
-  "notes": "版本检查双源：jsDelivr 优先、raw 兜底"
+  "notes": "版本检查并发取两源，取较高版本"
 }

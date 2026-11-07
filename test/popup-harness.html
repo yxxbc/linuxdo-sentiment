@@ -1,0 +1,44 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>popup harness</title></head>
+<body>
+<pre id="result">…</pre>
+<script src="../src/version.js"></script>
+<script>
+// 1) 把真实弹窗的 DOM 拷进来
+fetch('../src/popup/popup.html').then(function (r) { return r.text(); }).then(function (html) {
+  var doc = new DOMParser().parseFromString(html, 'text/html');
+  Array.prototype.forEach.call(doc.body.children, function (n) {
+    if (n.tagName !== 'SCRIPT') document.body.appendChild(document.importNode(n, true));
+  });
+
+  // 2) 桩：chrome API + 两个源返回不同版本（模拟 CDN 缓存不一致）
+  window.chrome = {
+    runtime: { getManifest: function () { return { version: '0.2.2' }; } },
+    storage: { local: {
+      get: function (_, cb) { cb({ days: {}, byCat: {}, update: null }); },
+      set: function () { window.__saved = arguments[0]; }
+    } },
+    tabs: { create: function (o) { window.__opened = o.url; } }
+  };
+  window.fetch = function (url) {
+    var v = url.indexOf('jsdelivr') >= 0 ? '0.2.3' : '0.2.4';
+    return Promise.resolve({ ok: true, json: function () { return Promise.resolve({ version: v, url: 'https://example.com/rel' }); } });
+  };
+
+  // 3) 载入真实 popup.js
+  var s = document.createElement('script');
+  s.src = '../src/popup/popup.js';
+  document.body.appendChild(s);
+
+  setTimeout(function () {
+    var link = document.querySelector('#msg a');
+    document.getElementById('result').textContent = JSON.stringify({
+      msg: document.getElementById('msg').textContent.trim(),
+      hasLink: !!link,
+      href: link ? link.getAttribute('href') : '',
+      stored: window.__saved && window.__saved.update ? window.__saved.update.latest : null
+    });
+  }, 800);
+});
+</script>
+</body></html>

@@ -39,23 +39,30 @@
     msg.appendChild(a);
   }
 
-  function fetchVersion(i) {
-    if (i >= VERSION_URLS.length) return Promise.reject(new Error('所有源都不可用'));
-    return fetch(VERSION_URLS[i] + '?t=' + Date.now(), { cache: 'no-store' })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.json();
-      })
-      .then(function (data) {
-        if (!data || !data.version) throw new Error('无版本号');
-        return data;
-      })
-      .catch(function () { return fetchVersion(i + 1); });
+  // 并发取所有源，取版本最高的那个（CDN 各自有缓存，单源会读到旧版本）
+  function fetchVersion() {
+    var reqs = VERSION_URLS.map(function (u) {
+      return fetch(u + '?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
+        .catch(function () { return null; });
+    });
+    return Promise.all(reqs).then(function (list) {
+      var best = null;
+      list.forEach(function (d) {
+        if (!d || !d.version) return;
+        if (!best || window.LDSVersion.isNewer(best.version, d.version)) best = d;
+      });
+      if (!best) throw new Error('所有源都不可用');
+      return best;
+    });
   }
 
   function checkUpdate() {
     msg.textContent = '检查中…';
-    fetchVersion(0)
+    fetchVersion()
       .then(function (data) {
         var latest = String(data.version || '');
         if (!latest) throw new Error('version.json 无版本号');

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "L站舆情仪表",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "在 linux.do 页面上本地统计文本戾气、阴阳怪气与攻击性浓度。默认不联网，不上传任何内容。",
   "icons": {
     "16": "src/assets/icons/icon16.png",
