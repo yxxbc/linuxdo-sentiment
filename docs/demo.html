@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>L站舆情仪表 · 演示</title>
+<link rel="stylesheet" href="../src/panel.css">
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; background: #f7f7f8; }
+  .shell { max-width: 820px; margin: 0 auto; padding: 24px 0 80px; background: #fff; min-height: 100vh; }
+  .topic-title { font: 600 22px/1.4 -apple-system, "PingFang SC", sans-serif; margin: 0 0 16px; padding: 0 24px; color: #111; }
+  .topic-post { display: flex; gap: 12px; padding: 14px 24px; border-top: 1px solid #eee; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #dfe3e8; flex: none; }
+  .topic-meta-data { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .username { font: 600 13px/1 -apple-system, "PingFang SC", sans-serif; color: #222; }
+  .post-infos { font: 11px/1 -apple-system, sans-serif; color: #999; }
+  .cooked { font: 14px/1.65 -apple-system, "PingFang SC", sans-serif; color: #1f2328; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <h1 class="topic-title">长上下文是不是都会“放彩虹屁”？</h1>
+
+  <article class="topic-post" data-post-id="1">
+    <div class="avatar"></div>
+    <div>
+      <div class="topic-meta-data"><a class="username" href="#"><span class="username">alice</span></a><span class="post-infos">#1</span></div>
+      <div class="cooked">请问一下，500K 上下文和 1M 实际差多少？我这边的长任务老是重复输出。</div>
+    </div>
+  </article>
+
+  <article class="topic-post" data-post-id="2">
+    <div class="avatar"></div>
+    <div>
+      <div class="topic-meta-data"><a class="username" href="#"><span class="username">bob</span></a><span class="post-infos">#2</span></div>
+      <div class="cooked">这个脚本我测了，500K 正常，满 1M 开始重复，可能是注意力问题。</div>
+    </div>
+  </article>
+
+  <article class="topic-post" data-post-id="3">
+    <div class="avatar"></div>
+    <div>
+      <div class="topic-meta-data"><a class="username" href="#"><span class="username">carol</span></a><span class="post-infos">#3</span></div>
+      <div class="cooked">大佬说得对，已严肃学习。</div>
+    </div>
+  </article>
+
+  <article class="topic-post" data-post-id="4">
+    <div class="avatar"></div>
+    <div>
+      <div class="topic-meta-data"><a class="username" href="#"><span class="username">dave</span></a><span class="post-infos">#4</span></div>
+      <div class="cooked">你这人是不是有病？别人问个问题你也要阴阳？</div>
+    </div>
+  </article>
+
+  <article class="topic-post" data-post-id="5">
+    <div class="avatar"></div>
+    <div>
+      <div class="topic-meta-data"><a class="username" href="#"><span class="username">eve</span></a><span class="post-infos">#5</span></div>
+      <div class="cooked">还去英国？第二个印度，乱的啥逼样了，都要解体了。</div>
+    </div>
+  </article>
+</div>
+<pre id="out" hidden></pre>
+
+<script src="../src/model.js"></script>
+<script src="../src/classifier.js"></script>
+<script src="../src/core.js"></script>
+<script src="../src/ui.js"></script>
+<script>
+(function () {
+  var posts = LDSCore.extractPosts(document);
+  posts.forEach(function (p) {
+    p.result = LDSClassifier.score(p.text);
+    var off = LDSClassifier.offensive(p.text);
+    if (off && off.severe) { p.result.severe = true; p.result.score = Math.max(p.result.score, 60); }
+    LDSUI.markPost(p, p.result);
+  });
+  var s = LDSCore.summarize(posts.map(function (p) {
+    return { score: p.result.score, author: p.author, text: p.text, el: p.el };
+  }));
+  s.scored = posts.map(function (p) { return { score: p.result.score }; });
+  LDSUI.mount(LDSUI.panel(s, { title: 'L站舆情 · 本主题' }));
+})();
+</script>
+</body>
+</html>

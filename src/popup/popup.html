@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>L站舆情仪表</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; width: 300px; padding: 14px 14px 12px;
+    background: #1b1d21; color: #e8e8e8;
+    font: 12px/1.5 -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  }
+  .head { display: flex; align-items: center; justify-content: space-between; }
+  .title { font-size: 13px; font-weight: 600; color: #fff; }
+  .ver { color: #777; font-size: 11px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .cell { background: #23252a; border: 1px solid #2f3238; border-radius: 8px; padding: 8px 10px; }
+  .num { font-size: 18px; font-weight: 700; color: #fff; }
+  .lbl { color: #8b8f98; font-size: 11px; }
+  .row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
+  .bar { flex: 1; height: 6px; background: #2a2c31; border-radius: 3px; overflow: hidden; }
+  .fill { height: 100%; }
+  .cat { width: 72px; color: #9a9a9a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .val { width: 30px; text-align: right; color: #777; font-size: 11px; }
+  .foot { display: flex; gap: 8px; margin-top: 12px; }
+  button, a.btn {
+    flex: 1; text-align: center; text-decoration: none;
+    background: #2a2c31; color: #ddd; border: 1px solid #3a3d44; border-radius: 7px;
+    padding: 6px 8px; font-size: 12px; cursor: pointer;
+  }
+  button:hover, a.btn:hover { background: #33363d; }
+  #msg { margin-top: 8px; min-height: 16px; color: #8b8f98; font-size: 11px; }
+  .empty { color: #777; margin: 10px 0; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <span class="title">L站舆情仪表</span>
+    <span class="ver" id="ver">v–</span>
+  </div>
+
+  <div class="grid">
+    <div class="cell"><div class="num" id="n">0</div><div class="lbl">今日分析帖数</div></div>
+    <div class="cell"><div class="num" id="mean">–</div><div class="lbl">今日均分</div></div>
+    <div class="cell"><div class="num" id="hot">0</div><div class="lbl">攻击性</div></div>
+    <div class="cell"><div class="num" id="snark">0</div><div class="lbl">阴阳/对立</div></div>
+  </div>
+
+  <div id="cats"></div>
+  <div class="empty" id="empty" hidden>今天还没在帖子里用过。打开一个 linux.do 主题即可。</div>
+
+  <div class="foot">
+    <button id="check">检查更新</button>
+    <a class="btn" id="repo" href="https://github.com/yxxbc/linuxdo-sentiment" target="_blank" rel="noreferrer">仓库</a>
+  </div>
+  <div id="msg"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
